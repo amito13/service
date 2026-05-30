@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, varchar,pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, varchar,pgEnum,integer } from 'drizzle-orm/pg-core';
 export const accountTypeEnum = pgEnum("account_type", [
   "USER",
   "PROFESSIONAL",
@@ -22,7 +22,7 @@ export const users = pgTable('users', {
 
 export const professionals = pgTable('professionals', {
     id: serial('id').primaryKey(),
-    userId: serial('user_id').notNull().references(() => users.id),
+    userId: integer('user_id').notNull().references(() => users.id),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow()
@@ -41,4 +41,30 @@ export const professionalCategories = pgTable('professional_categories', {
     categoryId: serial('category_id').notNull().references(() => categories.id),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow()
+});
+
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+
+  professionalId: integer("professional_id")
+    .notNull()
+    .references(() => professionals.id),
+
+  categoryId: integer("category_id")
+    .notNull()
+    .references(() => categories.id),
+
+  description: text("description").notNull(),
+
+  status: varchar("status", { length: 50 })
+    .default("PENDING")
+    .notNull(),
+
+  createdAt: timestamp("created_at").defaultNow(),
+
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
